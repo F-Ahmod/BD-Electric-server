@@ -1,7 +1,6 @@
 const express = require('express');
+const stripe = require('stripe')('sk_test_51KFv2GLrL1EnXa50ySgpEtLrqPPzBfUqETKHomqlbDDeicL9eMfjim2a0vJHXSwYtolw0AgautHKuVCCKNLnuKfQ00uUyAQ9o8');
 const { MongoClient } = require('mongodb');
-
-
 require('dotenv').config();
 const app = express();
 const ObjectId = require('mongodb').ObjectId;
@@ -191,6 +190,34 @@ async function run() {
       res.send(user)
 
     });
+
+    // stripe payment gatway
+    app.post('/payAmount', async (req, res) => {
+      const paymentInfo = req.body;
+      const amount = paymentInfo.price * 100;
+      const paymentIntent = await stripe.paymentIntents.create({
+          currency: 'usd',
+          amount: amount,
+          payment_method_types: ['card']
+      });
+      res.json({ clientSecret: paymentIntent.client_secret })
+  });
+
+  // set payment status
+  app.put('/payProduct/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const payment = req.body;
+      const filter = { _id:ObjectId (id)};
+      const updateDoc = {
+          $set: {
+              paid:true
+          }
+      };
+      const result = await bookMobileCallection.updateOne(filter, updateDoc);
+      res.json(result);
+  })
+
 
   }
 
