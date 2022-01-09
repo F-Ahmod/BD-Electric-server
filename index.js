@@ -227,8 +227,9 @@ async function run() {
 }
 run().catch(console.dir);
 
+
 app.get('/', (req, res) => {
-  res.send('runing server 5000')
+  res.send('runing my server 5000')
 });
 app.listen(port, () => {
   console.log('live server', port);
